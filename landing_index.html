@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jinelle Piereder · Interactive Explorables</title>
+<meta name="description" content="Scroll-driven interactive explorables by Jinelle Piereder—turning research on networks, ideology, and complex systems into visualizations you can explore.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --paper: #f5f1e8;
+    --paper-2: #ece6d7;
+    --ink: #1f2937;
+    --ink-soft: #3c4656;
+    --muted: #6b7280;
+    --rule: #d9d2bf;
+    --accent: #4a6b5e;
+    --accent-soft: #8aa49a;
+    --highlight: #e8dfc8;
+    --serif: 'Fraunces', Georgia, serif;
+    --body: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--body);
+    color: var(--ink);
+    background: var(--paper);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .serif { font-family: var(--serif); font-optical-sizing: auto; }
+  .mono { font-family: var(--mono); }
+  a { color: inherit; }
+
+  /* ── NAV ── */
+  .nav {
+    max-width: 1240px; margin: 0 auto; width: 100%;
+    padding: 28px 48px 0;
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .nav__name { font-family: var(--serif); font-size: 20px; letter-spacing: 0.01em; font-weight: 400; text-decoration: none; }
+  .nav__name em { font-style: italic; color: var(--accent); font-weight: 300; }
+  .nav__links { display: flex; gap: 28px; font-size: 13.5px; color: var(--ink-soft); }
+  .nav__links a { text-decoration: none; position: relative; padding-bottom: 2px; }
+  .nav__links a:hover { color: var(--ink); }
+  .nav__links a.is-current { color: var(--ink); }
+  .nav__links a.is-current::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -2px;
+    height: 1px; background: var(--accent);
+  }
+
+  /* ── SHARED ── */
+  main { max-width: 1240px; margin: 0 auto; width: 100%; padding: 0 48px 40px; flex: 1; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--muted);
+  }
+
+  /* ── HERO ── */
+  .hero { padding: 56px 0 56px; }
+  .hero__eyebrow-row { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+  .hero__eyebrow-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .hero__headline {
+    font-family: var(--serif); font-weight: 300;
+    font-size: clamp(38px, 5vw, 62px); line-height: 1.05;
+    letter-spacing: -0.015em; margin: 0 0 28px; color: var(--ink);
+    text-wrap: balance; max-width: 16ch;
+  }
+  .hero__headline em { font-style: italic; color: var(--accent); font-weight: 300; }
+  .hero__intro { font-size: 17px; line-height: 1.65; color: var(--ink-soft); max-width: 56ch; margin: 0; }
+
+  /* ── COLLECTION ── */
+  .collection { padding-top: 40px; border-top: 1px solid var(--rule); }
+  .collection__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; flex-wrap: wrap; gap: 12px; }
+  .collection__title { font-family: var(--serif); font-weight: 300; font-size: 28px; margin: 0; letter-spacing: -0.01em; }
+  .collection__title em { font-style: italic; color: var(--accent); font-weight: 300; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 36px; }
+
+  .card { display: flex; flex-direction: column; text-decoration: none; color: inherit; position: relative; }
+  .card__thumb {
+    aspect-ratio: 16 / 9; background: var(--paper-2);
+    border: 1px solid var(--rule); position: relative; overflow: hidden;
+    margin-bottom: 20px;
+    transition: transform 320ms cubic-bezier(.2,.7,.2,1), box-shadow 320ms;
+  }
+  .card.is-live:hover .card__thumb { transform: translateY(-3px); box-shadow: 0 16px 32px -18px rgba(31,41,55,0.22); }
+  .card__thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .card__thumb-label {
+    position: absolute; left: 12px; top: 12px;
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--muted);
+    background: var(--paper); padding: 4px 8px; border: 1px solid var(--rule); z-index: 2;
+  }
+  .card__meta {
+    display: flex; gap: 12px; font-family: var(--mono);
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.16em;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .card__meta .kind { color: var(--accent); }
+  .card__title { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.25; margin: 0 0 10px; letter-spacing: -0.005em; }
+  .card__blurb { font-size: 14.5px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 14px; flex: 1; }
+  .card__credit { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin: 0 0 16px; }
+  .card__credit a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 1px; transition: border-color 160ms; }
+  .card__credit a:hover { border-color: var(--accent); }
+  .card__cta {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--ink); margin-top: auto;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .card__cta .arr { transition: transform 200ms ease; }
+  .card.is-live:hover .card__cta .arr { transform: translateX(3px); }
+  .card__link { position: absolute; inset: 0; z-index: 3; }
+
+  .card.is-soon { opacity: 0.66; }
+  .card.is-soon .card__cta { color: var(--muted); }
+
+  /* ── FOOTER ── */
+  .site-footer { border-top: 1px solid var(--rule); background: var(--paper); }
+  .footer-inner {
+    max-width: 1240px; margin: 0 auto; padding: 36px 48px 48px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 32px; flex-wrap: wrap;
+  }
+  .footer-name { font-family: var(--serif); font-size: 17px; }
+  .footer-name em { font-style: italic; color: var(--accent); font-weight: 300; }
+  .footer-tagline { font-size: 13px; color: var(--muted); margin-top: 6px; max-width: 42ch; line-height: 1.5; }
+  .footer-links { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+  .footer-links a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 1px; width: fit-content; transition: border-color 160ms, color 160ms; }
+  .footer-links a:hover { color: var(--ink); border-color: var(--accent); }
+  .footer-links .eyebrow { margin-bottom: 2px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .nav { padding: 20px 22px 0; flex-direction: column; gap: 14px; align-items: flex-start; }
+    .nav__links { gap: 18px; }
+    main { padding: 0 22px 32px; }
+    .hero { padding: 40px 0 40px; }
+    .grid { grid-template-columns: 1fr; gap: 28px; }
+    .footer-inner { padding: 28px 22px 36px; flex-direction: column; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition-duration: 0.01ms !important; }
+    .card.is-live:hover .card__thumb { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav__name" href="#">Jinelle <em>Piereder</em></a>
+  <div class="nav__links">
+    <a href="#" class="is-current">Explorables</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero-wrap">
+  <main>
+    <section class="hero">
+      <div class="hero__eyebrow-row">
+        <span class="dot"></span>
+        <span class="eyebrow">Interactive Explorables</span>
+      </div>
+      <h1 class="hero__headline">Research you can <em>explore</em>, not just read</h1>
+      <p class="hero__intro">I build scroll-driven explorables that turn research on networks, ideology, and complex systems into visualizations you can move through at your own pace. Scroll through the story, and the picture changes with you. A small and growing collection lives here.</p>
+    </section>
+
+    <!-- COLLECTION -->
+    <section class="collection">
+      <div class="collection__head">
+        <h2 class="collection__title">The <em>collection</em></h2>
+        <span class="eyebrow">Updated June 2026</span>
+      </div>
+
+      <div class="grid">
+
+        <!-- NETWORKS 101 — LIVE -->
+        <article class="card is-live">
+          <a class="card__link" href="networks-101/" aria-label="Open the Networks 101 explorable"></a>
+          <div class="card__thumb">
+            <span class="card__thumb-label">Live</span>
+            <svg id="thumb-networks" aria-hidden="true"></svg>
+          </div>
+          <div class="card__meta"><span class="kind">Network science</span><span>8-step explorable</span></div>
+          <h3 class="card__title">Networks 101</h3>
+          <p class="card__blurb">Why the structure of a network shapes everything that flows through it—from pathogens to political power to electricity. Watch a network grow, spread a contagion, concentrate power, cascade across a coupling, and be defended against attack.</p>
+          <p class="card__credit">Produced for the <a href="https://cascadeinstitute.org">Cascade Institute</a> · Complexity Concepts series</p>
+          <span class="card__cta">Launch the interactive <span class="arr">→</span></span>
+        </article>
+
+        <!-- PLACEHOLDER — COMING SOON -->
+        <article class="card is-soon">
+          <div class="card__thumb">
+            <span class="card__thumb-label">In development</span>
+            <svg id="thumb-soon" aria-hidden="true"></svg>
+          </div>
+          <div class="card__meta"><span class="kind">Coming soon</span><span>—</span></div>
+          <h3 class="card__title">More on the way</h3>
+          <p class="card__blurb">Further explorables on ideology, governance, and complex-systems dynamics are in progress. Check back, or reach out through my main site if you'd like to be notified.</p>
+          <span class="card__cta">In development</span>
+        </article>
+
+      </div>
+    </section>
+  </main>
+</header>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-name">Jinelle <em>Piereder</em></p>
+      <p class="footer-tagline">Researcher working across political ideology, global governance, and complexity science.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Card thumbnail networks — sage hubs on warm paper, matching the brand.
+function drawThumb(id, opts) {
+  opts = opts || {};
+  const svg = d3.select('#' + id);
+  if (svg.empty()) return;
+  const W = 480, H = 270;
+  svg.attr('viewBox', `0 0 ${W} ${H}`);
+  const n = opts.n || 18;
+  const nodes = d3.range(n).map(i => ({ id: i }));
+  const links = [];
+  const deg = id => links.filter(l => l.source === id || l.target === id).length;
+  for (let i = 1; i < n; i++) {
+    // preferential-ish attachment so a couple of hubs emerge
+    let target = 0, best = -1;
+    for (let j = 0; j < i; j++) { const d = deg(j) + Math.random() * 2; if (d > best) { best = d; target = j; } }
+    links.push({ source: i, target });
+    if (i > 3 && Math.random() < 0.25) { // a few extra links for texture
+      const t2 = Math.floor(Math.random() * i);
+      if (t2 !== i) links.push({ source: i, target: t2 });
+    }
+  }
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(42))
+    .force('charge', d3.forceManyBody().strength(-90))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collision', d3.forceCollide(9)).stop();
+  for (let i = 0; i < 180; i++) sim.tick();
+  nodes.forEach(d => { d.x = Math.max(16, Math.min(W - 16, d.x)); d.y = Math.max(16, Math.min(H - 16, d.y)); });
+
+  const linkColor = opts.muted ? 'rgba(107,114,128,0.22)' : 'rgba(74,107,94,0.28)';
+  const hubColor = opts.muted ? '#8aa49a' : '#4a6b5e';
+  const nodeColor = opts.muted ? 'rgba(107,114,128,0.5)' : 'rgba(60,70,86,0.55)';
+
+  svg.selectAll('line').data(links).enter().append('line')
+    .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x).attr('y2', d => d.target.y)
+    .attr('stroke', linkColor).attr('stroke-width', 1);
+  svg.selectAll('circle').data(nodes).enter().append('circle')
+    .attr('cx', d => d.x).attr('cy', d => d.y)
+    .attr('r', d => deg(d.id) > 3 ? 8 : 4)
+    .attr('fill', d => deg(d.id) > 3 ? hubColor : nodeColor);
+}
+
+drawThumb('thumb-networks', { n: 20 });
+drawThumb('thumb-soon', { n: 14, muted: true });
+</script>
+</body>
+</html>
