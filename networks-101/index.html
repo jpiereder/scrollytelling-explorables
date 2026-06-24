@@ -302,6 +302,8 @@
   }
   .noteref:hover { color: var(--accent-deep); }
   .noteref:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 1px; }
+  .step p a:not(.noteref), .sidebar-note a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; transition: color 0.2s; }
+  .step p a:not(.noteref):hover, .sidebar-note a:hover { color: var(--accent-deep); }
 
   .legend { display: flex; flex-direction: column; gap: 0.5rem; margin: 1.2rem 0; font-size: 0.82rem; color: var(--text-secondary); }
   .legend-item { display: flex; align-items: center; gap: 0.7rem; }
@@ -584,6 +586,7 @@
           <span class="note-label">Why hubs change everything</span>
           Seed at the periphery and the contagion often fizzles. Seed at a hub and it reaches the whole network in a few steps. The lower <em>k</em> is, the more a single super-spreader event matters.
         </div>
+        <p>The same dynamics shape how new <em>technologies</em> spread. Adoption travels less by broadcast than through <strong>trusted social ties</strong>—peers and local opinion leaders—so it often turns on a few well-connected endorsers, much as contagion turns on hubs.<a class="noteref" href="#note-4" id="ref-4">4</a> In its work on <a href="https://cascadeinstitute.org/canada-invests-in-first-national-geothermal-energy-roadmap-cascade-institute-to-lead-coalition/">next-generation geothermal technology</a>, the Cascade Institute finds that endorsement from <a href="https://cascadeinstitute.org/researchers-use-deep-listening-to-gauge-geothermal-sentiments/">trusted community voices</a> is what shifts opinion and drives adoption. Social acceptance, in this sense, is a network problem.</p>
       </div>
 
       <!-- § 6 — POWER AND POSITION -->
@@ -613,7 +616,7 @@
           <div class="legend-item"><div class="legend-dot" style="background:var(--node-b)"></div><span>Network B (e.g., communications)</span></div>
           <div class="legend-item"><div class="legend-line" style="background:var(--node-bridge)"></div><span>Dependency link</span></div>
         </div>
-        <p>Here is the counterintuitive part. In a <em>single</em> scale-free network, removing a random node is almost harmless. But in <strong>coupled networks</strong>, even a random failure can cascade—because a low-degree node in one network may be the lifeline for a high-degree hub in another.<a class="noteref" href="#note-1">1</a><a class="noteref" href="#note-4" id="ref-4">4</a> The protection that single networks enjoy breaks down when systems depend on each other.</p>
+        <p>Here is the counterintuitive part. In a <em>single</em> scale-free network, removing a random node is almost harmless. But in <strong>coupled networks</strong>, even a random failure can cascade—because a low-degree node in one network may be the lifeline for a high-degree hub in another.<a class="noteref" href="#note-1">1</a><a class="noteref" href="#note-5" id="ref-5">5</a> The protection that single networks enjoy breaks down when systems depend on each other.</p>
       </div>
 
       <!-- § 8 — DEFENDING A NETWORK -->
@@ -675,7 +678,8 @@
         <li id="note-1">Buldyrev, Parshani, Paul, Stanley, and Havlin. 2010. "Catastrophic Cascade of Failures in Interdependent Networks." <em>Nature</em> 464: 1025–28. <a class="backref" href="#ref-1">↩</a></li>
         <li id="note-2">Barabási. 2009. "Scale-Free Networks: A Decade and Beyond." <em>Science</em> 325: 412–13; Papadopoulos et al. 2012. "Popularity versus Similarity in Growing Networks." <em>Nature</em> 489: 537–40. <a class="backref" href="#ref-2">↩</a></li>
         <li id="note-3">Kupferschmidt. 2020. "Why Do Some COVID-19 Patients Infect Many Others?" <em>Science</em>, May 19; Tufekci. 2020. "This Overlooked Variable Is the Key to the Pandemic." <em>The Atlantic</em>, September 30. <a class="backref" href="#ref-3">↩</a></li>
-        <li id="note-4">Parshani, Buldyrev, and Havlin. 2010. "Interdependent Networks: Reducing the Coupling Strength Leads to a Change from a First to Second Order Percolation Transition." <em>Physical Review Letters</em> 105: 048701. <a class="backref" href="#ref-4">↩</a></li>
+        <li id="note-4">Milli, Rossetti, Pedreschi, and Giannotti. 2018. "Active and Passive Diffusion Processes in Complex Networks." <em>Applied Network Science</em> 3 (1): 1. <a class="backref" href="#ref-4">↩</a></li>
+        <li id="note-5">Parshani, Buldyrev, and Havlin. 2010. "Interdependent Networks: Reducing the Coupling Strength Leads to a Change from a First to Second Order Percolation Transition." <em>Physical Review Letters</em> 105: 048701. <a class="backref" href="#ref-5">↩</a></li>
       </ol>
     </div>
 
